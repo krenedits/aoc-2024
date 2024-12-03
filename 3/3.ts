@@ -5,7 +5,7 @@ const result1 = [...data.matchAll(/mul\((\d+),(\d+)\)/g)].reduce(
     (acc, [, a, b]) => acc + +a * +b,
     0,
 );
-const result2 = [...data.matchAll(/mul\((\d+),(\d+)\)|do\(\)|don\'t\(\)/g)].reduce(
+const result2 = [...data.matchAll(/mul\((\d+),(\d+)\)|do\(\)|don't\(\)/g)].reduce(
     (acc, match) => {
         if (match[0] === 'do()') {
             return {
