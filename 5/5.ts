@@ -5,7 +5,7 @@ const [rawOrders, rawUpdates] = data.split('\n\n');
 
 const orders = rawOrders.split('\n');
 
-const compare = (a: number, b: number): number => {
+const compare = (a: string, b: string): number => {
     if (orders.includes(a + '|' + b)) {
         return -1;
     }
@@ -17,11 +17,9 @@ const compare = (a: number, b: number): number => {
     return 0;
 };
 
-const updates = rawUpdates
-    .split('\n')
-    .map((update) => update.split(',').map(Number));
+const updates = rawUpdates.split('\n').map((update) => update.split(','));
 
-const isCorrectOrder = (row: number[]): boolean => {
+const isCorrectOrder = (row: string[]): boolean => {
     return [...row].sort(compare).join(',') === row.join(',');
 };
 
@@ -32,9 +30,9 @@ updates.forEach((update) => {
     const medianIndex = Math.floor(update.length / 2);
 
     if (isCorrectOrder(update)) {
-        result1 += update[medianIndex];
+        result1 += +update[medianIndex];
     } else {
-        result2 += update.sort(compare)[medianIndex];
+        result2 += +update.sort(compare)[medianIndex];
     }
 });
 
