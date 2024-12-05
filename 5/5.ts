@@ -4,69 +4,61 @@ const data = getData('input.txt');
 const [rawOrders, rawUpdates] = data.split('\n\n');
 
 const orders = rawOrders.split('\n');
-const updates = rawUpdates.split('\n').map((update) => update.split(',').map(Number));
+const updates = rawUpdates.split('\n').map((update) =>
+    update.split(',').map(Number)
+);
 
-type OrderHelper = Record<number, { left: number[]; right: number[] }>
+type OrderHelper = Record<number, { left: number[]; right: number[] }>;
 
 const helper: OrderHelper = {};
+
 orders.forEach((order) => {
     const [left, right] = order.split('|').map(Number);
 
-    if (!helper[left] && !helper[right]) {
-        helper[left] = { left: [], right: [right] };
-        helper[right] = { left: [left], right: [] };
-    } else if (!helper[left] && helper[right]) {
-        helper[left] = { left: [], right: [right] };
-        helper[right].left.push(left);
-    } else if (helper[left] && !helper[right]) {
-        helper[right] = { left: [left], right: [] };
-        helper[left].right.push(right);
-    } else {
-        helper[left].right.push(right);
-        helper[right].left.push(left);
-    }
+    helper[left] = helper[left] || { left: [], right: [] };
+    helper[right] = helper[right] || { left: [], right: [] };
+
+    helper[left].right.push(right);
+    helper[right].left.push(left);
 });
 
 const isCorrectOrder = (row: number[]): boolean => {
-    let i = 0;
-    while (i < row.length) {
-        if (helper[row[i]]) {
-            const leftSide = row.slice(0, i);
-            const rightSide = row.slice(i + 1);
-            const hasRightOnLeft = leftSide.some((value) => helper[row[i]].right.includes(value));
-            const hasLeftOnRight = rightSide.some((value) => helper[row[i]].left.includes(value));
+    return row.every((value, i) => {
+        if (!helper[value]) return true;
 
-            if (hasRightOnLeft || hasLeftOnRight) {
-                return false;
-            }
-        }
-        i++;
-    }
+        const leftSide = row.slice(0, i);
+        const rightSide = row.slice(i + 1);
 
-    return true;
-}
+        const hasConflict =
+            leftSide.some((v) => helper[value].right.includes(v)) ||
+            rightSide.some((v) => helper[value].left.includes(v));
+
+        return !hasConflict;
+    });
+};
 
 const orderSort = (a: number, b: number): number => {
     if (helper[a] && helper[b]) {
         return isCorrectOrder([a, b]) ? -1 : 1;
     }
-
     return 0;
-}
+};
 
-const incorrects: number[][] = [];
+const incorrectUpdates: number[][] = [];
 
-const result1 = updates.reduce((acc, update) => {
-    const median = Math.floor(update.length / 2);
-    const incorrect = isCorrectOrder(update);
-    
-    if (!incorrect) {
-        incorrects.push(update);
+const result1 = updates.reduce((sum, update) => {
+    const medianIndex = Math.floor(update.length / 2);
+    const isOrderCorrect = isCorrectOrder(update);
+
+    if (!isOrderCorrect) {
+        incorrectUpdates.push(update);
     }
-    
-    return acc + (incorrect ? update[median] : 0);
+
+    return sum + (isOrderCorrect ? update[medianIndex] : 0);
 }, 0);
 
-const result2 = incorrects.map(incorrect => incorrect.sort(orderSort)).reduce((acc, update) => acc + update[Math.floor(update.length / 2)], 0);
+const result2 = incorrectUpdates
+    .map((update) => update.sort(orderSort))
+    .reduce((sum, update) => sum + update[Math.floor(update.length / 2)], 0);
 
 console.log(result1, result2);
