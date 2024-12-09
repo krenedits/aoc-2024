@@ -10,6 +10,8 @@ const getLines = <T extends string = string>(path: string): T[] => {
         .filter((line) => line !== '') as T[];
 };
 
+type Point = [number, number];
+
 class Matrix<T extends string | number> {
     constructor(public rows: T[][]) {
         this.rows = rows;
@@ -58,6 +60,77 @@ class Matrix<T extends string | number> {
             this.rows[row + 1]?.[column + 1],
         ].filter((value) => value !== undefined);
     }
+
+    find(value: T): Point | undefined {
+        return this.rows.reduce((acc, row, rowIndex) => {
+            const column = row.indexOf(value);
+
+            if (column !== -1) {
+                return [rowIndex, column];
+            }
+
+            return acc;
+        }, undefined as Point | undefined);
+    }
+
+    findAll(value: T): Point[] {
+        return this.rows.reduce((acc, row, rowIndex) => {
+            const columns = row
+                .map((char, columnIndex) => {
+                    if (char === value) {
+                        return [rowIndex, columnIndex];
+                    }
+
+                    return undefined;
+                })
+                .filter((column) => column !== undefined) as Point[];
+
+            return [...acc, ...columns];
+        }, [] as Point[]);
+    }
+
+    findAllByCondition(condition: (value: T) => boolean): Point[] {
+        return this.rows.reduce((acc, row, rowIndex) => {
+            const columns = row
+                .map((char, columnIndex) => {
+                    if (condition(char)) {
+                        return [rowIndex, columnIndex];
+                    }
+
+                    return undefined;
+                })
+                .filter((column) => column !== undefined) as Point[];
+
+            return [...acc, ...columns];
+        }, [] as Point[]);
+    }
+
+    get(row: number, column: number): T | undefined {
+        return this.rows[row]?.[column];
+    }
+
+    replace(row: number, column: number, value: T): void {
+        if (this.rows[row]?.[column]) {
+            this.rows[row][column] = value;
+        }
+    }
+
+    toString(): string {
+        return this.rows.map((row) => row.join('')).join('\n');
+    }
+
+    static getDifference(point1: Point, point2: Point): Point {
+        return [point1[0] - point2[0], point1[1] - point2[1]];
+    }
+
+    static add(point1: Point, point2: Point): Point {
+        return [point1[0] + point2[0], point1[1] + point2[1]];
+    }
+
+    static substract(point1: Point, point2: Point): Point {
+        return [point1[0] - point2[0], point1[1] - point2[1]];
+    }
 }
 
+export type { Point };
 export { getData, getLines, Matrix };
