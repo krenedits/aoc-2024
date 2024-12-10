@@ -38,7 +38,7 @@ class TraverseMatrix extends Matrix<number> {
     }
 
     trailheads() {
-        const trailheads = this.findAllByCondition((value) => value === this.START).reduce((acc, point) => {
+        return this.findAllByCondition((value) => value === this.START).reduce((acc, point) => {
             const trailheads = this.traverseFromPoint(point);
             
             return {
@@ -46,8 +46,6 @@ class TraverseMatrix extends Matrix<number> {
                 result2: acc.result2 + trailheads.length,
             };
         }, {result1: 0, result2: 0});
-
-        return trailheads;
     }
 }
 
