@@ -43,6 +43,15 @@ class Matrix<T extends string | number> {
         return result;
     }
 
+    getNeighbourPoints(row: number, column: number): Point[] {
+        return [
+            [row - 1, column],
+            [row + 1, column],
+            [row, column - 1],
+            [row, column + 1],
+        ];
+    }
+
     getNeighbours(row: number, column: number): T[] {
         return [
             this.rows[row - 1]?.[column],
