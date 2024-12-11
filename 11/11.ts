@@ -10,8 +10,10 @@ const transform = (number: number): number[] => {
     }
 
     const string = '' + number;
-    if (string.length % 2 === 0) {
-        return [+string.slice(0, string.length / 2), +string.slice(string.length / 2)];
+    const length = string.length;
+    if (length % 2 === 0) {
+        const center = length / 2;
+        return [+string.slice(0, center), +string.slice(center)];
     }
 
     return [number * 2024];
@@ -20,8 +22,7 @@ const transform = (number: number): number[] => {
 const simulation = (number: number, round: number) => {
     const key = round + '-' + number;
     if (cache[key]) {
-        const result = cache[key];
-        return result;
+        return cache[key];
     }
 
     if (round === 0) {
@@ -33,13 +34,26 @@ const simulation = (number: number, round: number) => {
     const result = transformed.reduce((acc, number) => {
         return acc + simulation(number, round - 1);
     }, 0);
+
     cache[key] = result;
 
     return result;
 };
 
+const getResult = (rounds: number) => {
+    return numbers.reduce((acc, number) => acc + simulation(number, rounds), 0);
+};
+
 console.time('start');
-const result1 = numbers.reduce((acc, number) => acc + simulation(number, 25), 0);
-const result2 = numbers.reduce((acc, number) => acc + simulation(number, 75), 0);
+
+console.time('part1');
+const result1 = getResult(25);
+console.timeEnd('part1');
+
+console.time('part2');
+const result2 = getResult(75);
+console.timeEnd('part2');
+
 console.timeEnd('start');
+
 console.log(result1, result2);
