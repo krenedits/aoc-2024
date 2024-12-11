@@ -1,6 +1,6 @@
 import { getLines, Matrix } from '../common';
-import * as fs from 'fs';
 
+console.time('time');
 const data = getLines('input.txt');
 const OBSTACLE = '#';
 type DirectionKey = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
@@ -11,7 +11,6 @@ const DIRECTIONS: Record<DirectionKey, [number, number]> = {
     LEFT: [0, -1],
     RIGHT: [0, 1],
 };
-const VISITED = 'X';
 const START = '^';
 
 const rotateDirectionRight = (direction: Direction): Direction => {
@@ -21,47 +20,17 @@ const rotateDirectionRight = (direction: Direction): Direction => {
 
 const getStringDirection = (direction: Direction): DirectionKey => {
     const [i, j] = direction;
-    return i === 0 ? (j === 1 ? 'RIGHT' : 'LEFT') : (i === 1 ? 'DOWN' : 'UP');
-}
-
-const getDirectionBetweenPoints = (start: [number, number], end: [number, number]): Direction => {
-    const [startI, startJ] = start;
-    const [endI, endJ] = end;
-    const i = endI - startI > 0 ? 1 : (endI - startI < 0 ? -1 : 0);
-    const j = endJ - startJ > 0 ? 1 : (endJ - startJ < 0 ? -1 : 0);
-    return [i, j];
-}
-
-const isConnected = ([i1, j1]: Direction, [i2, j2]: Direction, direction: Direction): boolean => {
-    return (i1 === i2 || j1 === j2) && compareDirections(getDirectionBetweenPoints([i1, j1], [i2, j2]), direction);
-}
-
-const compareDirections = (direction1: Direction, direction2: Direction): boolean => {
-    const [i1, j1] = direction1;
-    const [i2, j2] = direction2;
-    return i1 === i2 && j1 === j2;
-}
-
-
-const canCreateRectangleFromTriplet = (triplet: string, matrix: Matrix<string>): boolean => {
-    const [f, s, t] = triplet.split('|');
-    const [fI, fJ] = f.split('-').map(Number);
-    const [sI, sJ] = s.split('-').map(Number);
-    const [tI, tJ] = t.split('-').map(Number);
-
-    const fourthPoint = [fI === sI ? tI : fI, fJ === sJ ? tJ : fJ];
-
-    return matrix.getNeighbours(fourthPoint[0], fourthPoint[1]).some((value) => value === OBSTACLE);
-}
+    return i === 0 ? (j === 1 ? 'RIGHT' : 'LEFT') : i === 1 ? 'DOWN' : 'UP';
+};
 
 let infiniteSet = new Set<string>();
 
-const traverse = (start?: [number, number], defaultDirection?: Direction, plusObstacle?: [number, number]) => {
+const traverse = (plusObstacle?: [number, number]) => {
     const matrix = new Matrix<string>(data.map((line) => line.split('')));
     const visited = new Set<string>();
     const visitedWithDirection = new Set<string>();
-    let direction = defaultDirection ?? DIRECTIONS.UP;
-    let guard = start ?? matrix.find(START) as [number, number];
+    let direction = DIRECTIONS.UP;
+    let guard = matrix.find(START) as [number, number];
     let end = false;
     let infinite = false;
 
@@ -73,7 +42,9 @@ const traverse = (start?: [number, number], defaultDirection?: Direction, plusOb
         const [i, j] = direction;
         const [guardI, guardJ] = guard;
 
-        const visitedWithDirectionKey = `${guardI}-${guardJ}-${getStringDirection(direction)}`;
+        const visitedWithDirectionKey = `${guardI}-${guardJ}-${getStringDirection(
+            direction
+        )}`;
         if (plusObstacle && visitedWithDirection.has(visitedWithDirectionKey)) {
             infinite = true;
             infiniteSet.add(plusObstacle.join('-'));
@@ -89,37 +60,22 @@ const traverse = (start?: [number, number], defaultDirection?: Direction, plusOb
             break;
         }
 
-
         if (next === OBSTACLE) {
             direction = rotateDirectionRight(direction);
             continue;
         }
         visitedWithDirection.add(visitedWithDirectionKey);
 
-        if (!start) {
-            traverse(guard, direction, [guardI + i, guardJ + j]);
+        if (!plusObstacle) {
+            traverse([guardI + i, guardJ + j]);
         }
 
         guard = [guardI + i, guardJ + j];
     }
 
-    if (start) {
+    if (plusObstacle) {
         return infinite;
     }
-
-    // visited.forEach((point) => {
-    //     const [i, j] = point.split('-').map(Number);
-    //     matrix.replace(i, j, VISITED);
-    // })
-    
-    // infiniteSet.forEach((point) => {
-    //     const [i, j] = point.split('-').map(Number);
-    //     matrix.replace(i, j, 'K');
-    // })
-    // fs.writeFileSync('output.txt', matrix.toString());
-
-
-    console.log(Math.min(...[...infiniteSet.keys()].map((key) => Number(key.split('-')[0]))));
 
     return {
         result1: visited.size,
@@ -127,13 +83,10 @@ const traverse = (start?: [number, number], defaultDirection?: Direction, plusOb
     };
 };
 
-
 const { result1, result2 } = traverse() as {
     result1: number;
     result2: number;
 };
 
-// 1763 is too low
-// 1990 is too high
-
+console.timeEnd('time');
 console.log(result1, result2);
