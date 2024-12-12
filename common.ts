@@ -52,13 +52,19 @@ class Matrix<T extends string | number> {
         ];
     }
 
-    getNeighbours(row: number, column: number): T[] {
-        return [
+    getNeighbours(row: number, column: number, all = false): T[] {
+        const neighbours = [
             this.rows[row - 1]?.[column],
             this.rows[row + 1]?.[column],
-            this.columns[column - 1]?.[row],
-            this.columns[column + 1]?.[row],
-        ].filter((value) => value !== undefined);
+            this.rows[row]?.[column - 1],
+            this.rows[row]?.[column + 1],
+        ];
+
+        if (all) {
+            return neighbours;
+        }
+        
+        return neighbours.filter((value) => value !== undefined);
     }
 
     getDiagonalNeighbourPoints(row: number, column: number): Point[] {
@@ -70,13 +76,33 @@ class Matrix<T extends string | number> {
         ];
     }
 
-    getDiagonalNeighbours(row: number, column: number): T[] {
-        return [
+    getDiagonalNeighbours(row: number, column: number, all = false): T[] {
+        const neighbours = [
             this.rows[row - 1]?.[column - 1],
             this.rows[row - 1]?.[column + 1],
             this.rows[row + 1]?.[column - 1],
             this.rows[row + 1]?.[column + 1],
-        ].filter((value) => value !== undefined);
+        ];
+
+        if (all) {
+            return neighbours;
+        }
+        
+        return neighbours.filter((value) => value !== undefined);
+    }
+
+    getAllNeighbours(row: number, column: number, all = false): { direct: T[]; diagonal: T[] } {
+        return {
+            direct: this.getNeighbours(row, column, all),
+            diagonal: this.getDiagonalNeighbours(row, column, all),
+        };
+    }
+
+    getAllNeighbourPoints(row: number, column: number): { direct: Point[]; diagonal: Point[] } {
+        return {
+            direct: this.getNeighbourPoints(row, column),
+            diagonal: this.getDiagonalNeighbourPoints(row, column),
+        };
     }
 
     find(value: T): Point | undefined {
