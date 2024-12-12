@@ -61,6 +61,15 @@ class Matrix<T extends string | number> {
         ].filter((value) => value !== undefined);
     }
 
+    getDiagonalNeighbourPoints(row: number, column: number): Point[] {
+        return [
+            [row - 1, column - 1],
+            [row - 1, column + 1],
+            [row + 1, column - 1],
+            [row + 1, column + 1],
+        ];
+    }
+
     getDiagonalNeighbours(row: number, column: number): T[] {
         return [
             this.rows[row - 1]?.[column - 1],
