@@ -174,6 +174,17 @@ class Matrix<T extends string | number> {
     static substract(point1: Point, point2: Point): Point {
         return [point1[0] - point2[0], point1[1] - point2[1]];
     }
+
+
+    // for 2x2 matrix only
+    static determinantForArray(matrix: number[][]): number {
+        return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+    }
+
+    // for 2x2 matrix only
+    static determinant(matrix: Matrix<number>): number {
+        return matrix.rows[0][0] * matrix.rows[1][1] - matrix.rows[0][1] * matrix.rows[1][0];
+    }
 }
 
 export type { Point };
