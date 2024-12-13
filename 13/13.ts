@@ -53,7 +53,12 @@ const solveEquations = (equations: [Equation, Equation]): number => {
     const { a: a1, b: b1, c: c1 } = equations[0];
     const { a: a2, b: b2, c: c2 } = equations[1];
 
-    // source: https://www.youtube.com/watch?v=95zVTo2nu3Q
+    // for 2x2 (or NxN idk)
+    // D = determinant
+    // Dx = determinant for 'a' column replaced with 'c' column
+    // Dy = determinant for 'b' row swapped with 'c' column
+    // x = Dx / D
+    // y = Dy / D
     const d = Matrix.determinantForArray([
         [a1, b1],
         [a2, b2],
