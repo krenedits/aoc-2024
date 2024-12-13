@@ -5,47 +5,25 @@ const groups = data.split('\n\n');
 
 const A_TOKEN = 3;
 const B_TOKEN = 1;
-
 const PART_2_NUMBER = 10 ** 13;
-
-interface Point {
-    x: number;
-    y: number;
-}
-
-interface Group {
-    A: Point;
-    B: Point;
-    prize: Point;
-}
-
-const parseData = (group: string): Group => {
-    const regex =
-        /Button A: X\+(\d+), Y\+(\d+)\nButton B: X\+(\d+), Y\+(\d+)\nPrize: X=(\d+), Y=(\d+)/g;
-
-    const [_, AX, AY, BX, BY, PX, PY] = [...group.matchAll(regex)][0];
-
-    return {
-        A: {
-            x: +AX,
-            y: +AY,
-        },
-        B: {
-            x: +BX,
-            y: +BY,
-        },
-        prize: {
-            x: +PX,
-            y: +PY,
-        },
-    };
-};
 
 interface Equation {
     a: number;
     b: number;
     c: number;
 }
+
+const parseData = (group: string): [Equation, Equation] => {
+    const regex =
+        /Button A: X\+(\d+), Y\+(\d+)\nButton B: X\+(\d+), Y\+(\d+)\nPrize: X=(\d+), Y=(\d+)/g;
+
+    const [_, AX, AY, BX, BY, PX, PY] = [...group.matchAll(regex)][0];
+
+    return [
+        { a: +AX, b: +BX, c: +PX },
+        { a: +AY, b: +BY, c: +PY },
+    ];
+};
 
 const isWholeNumber = (value: number) => Math.floor(value) === value;
 
@@ -81,25 +59,25 @@ const solveEquations = (equations: [Equation, Equation]): number => {
     return x * A_TOKEN + y * B_TOKEN;
 };
 
+console.time('time');
 const result = groups.reduce(
     (acc, group) => {
-        const { A, B, prize } = parseData(group);
-        const equations1: [Equation, Equation] = [
-            { a: A.x, b: B.x, c: prize.x },
-            { a: A.y, b: B.y, c: prize.y },
-        ];
+        const equations = parseData(group);
 
-        const equations2: [Equation, Equation] = [
-            { a: A.x, b: B.x, c: prize.x + PART_2_NUMBER },
-            { a: A.y, b: B.y, c: prize.y + PART_2_NUMBER },
-        ];
+        const equations2: [Equation, Equation] = equations.map((equation) => {
+            return {
+                ...equation,
+                c: equation.c + PART_2_NUMBER,
+            };
+        }) as [Equation, Equation];
 
         return {
-            result1: acc.result1 + solveEquations(equations1),
+            result1: acc.result1 + solveEquations(equations),
             result2: acc.result2 + solveEquations(equations2),
         };
     },
     { result1: 0, result2: 0 },
 );
+console.timeEnd('time');
 
 console.log(result.result1, result.result2);
