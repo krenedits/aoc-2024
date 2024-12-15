@@ -159,6 +159,10 @@ class Matrix<T extends string | number> {
         }
     }
 
+    replaceAll(value: T, newValue: T): void {
+        this.rows = this.rows.map((row) => row.map((char) => char === value ? newValue : char));
+    }
+
     toString(): string {
         return this.rows.map((row) => row.join('')).join('\n');
     }
