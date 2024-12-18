@@ -10,7 +10,15 @@ const getLines = <T extends string = string>(path: string): T[] => {
         .filter((line) => line !== '') as T[];
 };
 
+type Direction = 'UP' | 'RIGHT' | 'DOWN' | 'LEFT';
 type Point = [number, number];
+
+const DIRECTIONS: Record<Direction, Point> = {
+    UP: [-1, 0],
+    DOWN: [1, 0],
+    LEFT: [0, -1],
+    RIGHT: [0, 1]
+} 
 
 class Matrix<T extends string | number> {
     constructor(public rows: T[][]) {
@@ -189,7 +197,11 @@ class Matrix<T extends string | number> {
     static determinant(matrix: Matrix<number>): number {
         return matrix.rows[0][0] * matrix.rows[1][1] - matrix.rows[0][1] * matrix.rows[1][0];
     }
+
+    manhattanDistance(point1: Point, point2: Point): number {
+        return Math.abs(point1[0] - point2[0]) + Math.abs(point1[1] - point2[1]);
+    }
 }
 
-export type { Point };
-export { getData, getLines, Matrix };
+export type { Point, Direction };
+export { getData, getLines, Matrix, DIRECTIONS };
