@@ -12,13 +12,14 @@ const getLines = <T extends string = string>(path: string): T[] => {
 
 type Direction = 'UP' | 'RIGHT' | 'DOWN' | 'LEFT';
 type Point = [number, number];
+type NodeDistance = Record<`${number},${number}`, number>;
 
 const DIRECTIONS: Record<Direction, Point> = {
     UP: [-1, 0],
     DOWN: [1, 0],
     LEFT: [0, -1],
-    RIGHT: [0, 1]
-} 
+    RIGHT: [0, 1],
+};
 
 class Matrix<T extends string | number> {
     constructor(public rows: T[][]) {
@@ -35,15 +36,24 @@ class Matrix<T extends string | number> {
 
         while (j < this.rows.length) {
             result.push(this.rows.slice(j).map((row, index) => row[index]));
-            result.push(this.rows.map((_row, index) => {
-                const row = _row.slice(0, _row.length - j);                
-                return row[row.length - index - 1]
-            }).filter(row => row !== undefined));
+            result.push(
+                this.rows
+                    .map((_row, index) => {
+                        const row = _row.slice(0, _row.length - j);
+                        return row[row.length - index - 1];
+                    })
+                    .filter((row) => row !== undefined),
+            );
             if (j > 0) {
                 result.push(this.columns.slice(j).map((row, index) => row[index]));
-                result.push(this.columns.slice(j).map((row, index) => {
-                    return row[row.length - index - 1]
-                }).filter(row => row !== undefined));
+                result.push(
+                    this.columns
+                        .slice(j)
+                        .map((row, index) => {
+                            return row[row.length - index - 1];
+                        })
+                        .filter((row) => row !== undefined),
+                );
             }
             j++;
         }
@@ -71,7 +81,7 @@ class Matrix<T extends string | number> {
         if (all) {
             return neighbours;
         }
-        
+
         return neighbours.filter((value) => value !== undefined);
     }
 
@@ -95,7 +105,7 @@ class Matrix<T extends string | number> {
         if (all) {
             return neighbours;
         }
-        
+
         return neighbours.filter((value) => value !== undefined);
     }
 
@@ -168,7 +178,7 @@ class Matrix<T extends string | number> {
     }
 
     replaceAll(value: T, newValue: T): void {
-        this.rows = this.rows.map((row) => row.map((char) => char === value ? newValue : char));
+        this.rows = this.rows.map((row) => row.map((char) => (char === value ? newValue : char)));
     }
 
     toString(): string {
@@ -187,7 +197,6 @@ class Matrix<T extends string | number> {
         return [point1[0] - point2[0], point1[1] - point2[1]];
     }
 
-
     // for 2x2 matrix only
     static determinantForArray(matrix: number[][]): number {
         return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
@@ -203,5 +212,5 @@ class Matrix<T extends string | number> {
     }
 }
 
-export type { Point, Direction };
+export type { Point, Direction, NodeDistance };
 export { getData, getLines, Matrix, DIRECTIONS };

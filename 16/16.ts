@@ -1,4 +1,4 @@
-import { DIRECTIONS, getLines, Matrix, Point } from '../common';
+import { DIRECTIONS, getLines, Matrix, NodeDistance, Point } from '../common';
 
 const data = getLines('input.txt');
 const map = new Matrix(data.map((line) => line.split('')));
@@ -10,8 +10,6 @@ const FIELD = '.';
 const PASSABLE = [FIELD, END];
 const SCORES_ON_TURN = 1000;
 const START_DIRECTION = DIRECTIONS.RIGHT;
-
-type NodeDistance = Record<`${number},${number}`, number>;
 
 let absoluteMin: number | null = null;
 let localMin: number = Infinity;
